@@ -7,7 +7,7 @@ Simulate checksum error and communication timeout without sensor.
 1. Git clone this repository.
 
 ```
-git clone git@github.com:ito-san/fake_imu_simulator.git
+git clone git@github.com:ito-san/fake_sensor_tools.git
 ```
 
 2. Install dependency.
