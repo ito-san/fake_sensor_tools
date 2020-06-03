@@ -1,16 +1,16 @@
-CC							= gcc
-CXX							= g++
-SRCROOT					= $(CURDIR)
-OBJDIR					= $(CURDIR)/obj
-INCLUDES				= -I$(CURDIR)
-COMMONFLAGS			= -Wall -g -o
-CFLAGS					= $(INCLUDES) $(COMMONFLAGS) -Os
-CXXFLAGS				= $(INCLUDES) $(COMMONFLAGS) -Os
-TARGET					= $(CURDIR)/fake_gnss_simulator
-OBJS						= $(OBJDIR)/fake_gnss_simulator.o $(OBJDIR)/interface.o $(OBJDIR)/main.o
-PACKAGE					= `pkg-config --cflags --libs gtk+-3.0`
-LDFLAGS					= $(PACKAGE) -export-dynamic
-LDFLAGS					+= -lstdc++ -lboost_system -lboost_filesystem -lboost_thread
+CC          = gcc
+CXX         = g++
+SRCROOT     = $(CURDIR)
+OBJDIR      = $(CURDIR)/obj
+INCLUDES    = -I$(CURDIR)
+COMMONFLAGS = -Wall -g -o
+CFLAGS      = $(INCLUDES) $(COMMONFLAGS) -Os
+CXXFLAGS    = $(INCLUDES) $(COMMONFLAGS) -Os
+TARGET      = $(CURDIR)/fake_gnss_simulator
+OBJS        = $(OBJDIR)/fake_gnss_simulator.o $(OBJDIR)/interface.o $(OBJDIR)/main.o
+PACKAGE     = `pkg-config --cflags --libs gtk+-3.0`
+LDFLAGS     = $(PACKAGE) -export-dynamic
+LDFLAGS     += -lstdc++ -lboost_system -lboost_filesystem -lboost_thread
 
 .PHONY : target
 target: $(TARGET)

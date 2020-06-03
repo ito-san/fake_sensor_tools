@@ -31,6 +31,7 @@ sudo apt install glade
 4. Make build this project.
 
 ```
+cd fake_gnss_simulator
 make
 ```
 
@@ -43,8 +44,8 @@ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 ```
 
 The output will be like this.
-One of PTYs is used for [tamagawa_imu_driver](https://github.com/tier4/AutowareArchitectureProposal/tree/master/src/sensing/driver/tamagawa_serial_driver).<br>
-Another is used for Fake IMU Simulator.
+One of PTYs is used for [ublox](https://github.com/tier4/AutowareArchitectureProposal/tree/master/src/sensing/driver/ublox).<br>
+Another is used for Fake GNSS Simulator.
 
 ```
 
@@ -64,8 +65,11 @@ Another is used for Fake IMU Simulator.
 ./fake_gnss_simulator
 ```
 
-Enter device name, and choose a log file.
-![window](docs/images/window.png)
+Enter device name, and choose a log file.<br>
+
+- UBX log file: Only UBX messages must be included.
+- NMEA log file: Only NMEA messages must be included.
+  ![window](docs/images/window.png)
 
 Then, turn on the switch of `Serial Port` to open PTY serial port and transmit data.
 
