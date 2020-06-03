@@ -1,41 +1,15 @@
 # Fake GNSS Simulator for Autoware
 
-## Instructions before starting
+## Instructions
 
-1. Git clone this repository.
-
-```
-git clone git@github.com:ito-san/fake_sensor_tools.git
-```
-
-2. Install dependency.
-
-```
-sudo apt install libgtk-3-dev
-```
-
-3. Install `socat`.
-
-```
-sudo apt install socat
-```
-
-### <u>glade</u>
-
-If you design a user interface, install `glade`.
-
-```
-sudo apt install glade
-```
-
-4. Make build this project.
+1. Make build this project.
 
 ```
 cd fake_gnss_simulator
 make
 ```
 
-5. Create virtual serial ports
+2. Create virtual serial ports
 
 ```
 
@@ -55,11 +29,11 @@ Another is used for Fake GNSS Simulator.
 
 ```
 
-6. Launch ublox_gps.
+3. Launch ublox_gps.
 
    Change serial port to use PTY before running a launch file.
 
-7. Run Fake GNSS Simulator.
+4. Run Fake GNSS Simulator.
 
 ```
 ./fake_gnss_simulator

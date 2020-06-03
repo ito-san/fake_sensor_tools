@@ -1,40 +1,19 @@
 # Fake IMU Simulator for Autoware
 
-## Instructions before starting
-
-1. Git clone this repository.
+## Instructions
 
 ```
-git clone git@github.com:ito-san/fake_imu_simulator.git
-```
 
-2. Install dependency.
+1. Make build this project.
 
 ```
-sudo apt install libgtk-3-dev
-```
 
-3. Install `socat`.
-
-```
-sudo apt install socat
-```
-
-### <u>glade</u>
-
-If you design a user interface, install `glade`.
-
-```
-sudo apt install glade
-```
-
-4. Make build this project.
-
-```
+cd fake_imu_simulator
 make
+
 ```
 
-5. Create virtual serial ports
+2. Create virtual serial ports
 
 ```
 
@@ -54,14 +33,16 @@ Another is used for Fake IMU Simulator.
 
 ```
 
-6. Launch tamagawa_imu_driver.
+3. Launch tamagawa_imu_driver.
 
    Change serial port to use PTY before running a launch file.
 
-7. Run Fake IMU Simulator.
+4. Run Fake IMU Simulator.
 
 ```
+
 ./fake_imu_simulator
+
 ```
 
 Enter device name, and choose a log file.
@@ -77,3 +58,4 @@ The checksum value will be `??`.
 ### <u>Debug output</u>
 
 If you want to see transmission data, turn on the switch of `Debug output`.
+```

@@ -1,17 +1,16 @@
-CC							= gcc
-CXX							= g++
-SRCROOT					= $(CURDIR)
-OBJDIR					= $(CURDIR)/obj
-INCLUDES				= -I$(CURDIR)
-COMMONFLAGS			= -Wall -g -o
-CFLAGS					= $(INCLUDES) $(COMMONFLAGS) -Os
-CXXFLAGS				= $(INCLUDES) $(COMMONFLAGS) -Os
-TARGET					= $(CURDIR)/fake_imu_simulator
-OBJS						= $(OBJDIR)/fake_imu_simulator.o
-OBJS						+= $(OBJDIR)/main.o
-PACKAGE					= `pkg-config --cflags --libs gtk+-3.0`
-LDFLAGS					= $(PACKAGE) -export-dynamic
-LDFLAGS					+= -lstdc++ -lboost_system -lboost_filesystem
+CC					= gcc
+CXX         = g++
+SRCROOT     = $(CURDIR)
+OBJDIR      = $(CURDIR)/obj
+INCLUDES    = -I$(CURDIR)
+COMMONFLAGS = -Wall -g -o
+CFLAGS      = $(INCLUDES) $(COMMONFLAGS) -Os
+CXXFLAGS    = $(INCLUDES) $(COMMONFLAGS) -Os
+TARGET      = $(CURDIR)/fake_imu_simulator
+OBJS        = $(OBJDIR)/fake_imu_simulator.o $(OBJDIR)/main.o
+PACKAGE     = `pkg-config --cflags --libs gtk+-3.0`
+LDFLAGS     = $(PACKAGE) -export-dynamic
+LDFLAGS     += -lstdc++ -lboost_system -lboost_filesystem
 
 .PHONY : target
 target: $(TARGET)
