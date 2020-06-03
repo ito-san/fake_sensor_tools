@@ -12,9 +12,7 @@ make
 2. Create virtual serial ports
 
 ```
-
 socat -d -d pty,raw,echo=0 pty,raw,echo=0
-
 ```
 
 The output will be like this.
@@ -22,11 +20,9 @@ One of PTYs is used for [ublox](https://github.com/tier4/AutowareArchitecturePro
 Another is used for Fake GNSS Simulator.
 
 ```
-
 2020/05/22 17:29:10 socat[42184] N PTY is /dev/pts/0
 2020/05/22 17:29:10 socat[42184] N PTY is /dev/pts/2
 2020/05/22 17:29:10 socat[42184] N starting data transfer loop with FDs [5,5] and [7,7]
-
 ```
 
 3. Launch ublox_gps.
