@@ -38,6 +38,7 @@ Another is used for Fake GNSS Simulator.
 Enter device name, and choose a log file.<br>
 
 - UBX log file: Only UBX messages must be included.
+- UBX PVT log file: Only UBX-NAV-PVT messages must be included.
 - NMEA log file: Only NMEA messages must be included.
   ![window](docs/images/window.png)
 

@@ -15,12 +15,13 @@
  */
 typedef struct
 {
-  GtkWidget * w_txt_device_name;     //!< @brief GtkEntry
-  GtkWidget * w_file_ubx_log_file;   //!< @brief GtkFileChooserButton
-  GtkWidget * w_file_nmea_log_file;  //!< @brief GtkFileChooserButton
-  GtkWidget * w_sw_serial_port;      //!< @brief GtkSwitch
-  GtkWidget * w_sw_checksum_error;   //!< @brief GtkSwitch
-  GtkWidget * w_sw_debug_output;     //!< @brief GtkSwitch
+  GtkWidget * w_txt_device_name;        //!< @brief GtkEntry
+  GtkWidget * w_file_ubx_log_file;      //!< @brief GtkFileChooserButton
+  GtkWidget * w_file_ubx_pvt_log_file;  //!< @brief GtkFileChooserButton
+  GtkWidget * w_file_nmea_log_file;     //!< @brief GtkFileChooserButton
+  GtkWidget * w_sw_serial_port;         //!< @brief GtkSwitch
+  GtkWidget * w_sw_checksum_error;      //!< @brief GtkSwitch
+  GtkWidget * w_sw_debug_output;        //!< @brief GtkSwitch
 } Widgets;
 
 /**
@@ -47,6 +48,8 @@ int main(int argc, char * argv[])
   window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
   widgets->w_txt_device_name = GTK_WIDGET(gtk_builder_get_object(builder, "txt_device_name"));
   widgets->w_file_ubx_log_file = GTK_WIDGET(gtk_builder_get_object(builder, "file_ubx_log_file"));
+  widgets->w_file_ubx_pvt_log_file =
+    GTK_WIDGET(gtk_builder_get_object(builder, "file_ubx_pvt_log_file"));
   widgets->w_file_nmea_log_file = GTK_WIDGET(gtk_builder_get_object(builder, "file_nmea_log_file"));
   widgets->w_sw_serial_port = GTK_WIDGET(gtk_builder_get_object(builder, "sw_serial_port"));
   widgets->w_sw_checksum_error = GTK_WIDGET(gtk_builder_get_object(builder, "sw_checksum_error"));
@@ -59,6 +62,8 @@ int main(int argc, char * argv[])
   gtk_entry_set_text(GTK_ENTRY(widgets->w_txt_device_name), getDeviceName());
   // Set filename as the current filename for the file chooser
   gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(widgets->w_file_ubx_log_file), getUBXLogFile());
+  gtk_file_chooser_set_filename(
+    GTK_FILE_CHOOSER(widgets->w_file_ubx_pvt_log_file), getUBXPVTLogFile());
   gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(widgets->w_file_nmea_log_file), getNMEALogFile());
 
   // Connect handlers to the named signals
@@ -113,6 +118,18 @@ void on_file_ubx_log_file_selection_changed(GtkFileChooser * chooser, gpointer u
   // Get the filename for the currently selected file in the file selector
   // and set path of ubx log file for saving it to ini file
   setUBXLogFile(gtk_file_chooser_get_filename(chooser));
+}
+
+/**
+ * @brief Emitted when there is a change in the set of selected files
+ * @param [in] chooser the object which received the signal
+ * @param [in] user data set when the signal handler was connected
+ */
+void on_file_ubx_pvt_log_file_selection_changed(GtkFileChooser * chooser, gpointer user_data)
+{
+  // Get the filename for the currently selected file in the file selector
+  // and set path of ubx pvt log file for saving it to ini file
+  setUBXPVTLogFile(gtk_file_chooser_get_filename(chooser));
 }
 
 /**

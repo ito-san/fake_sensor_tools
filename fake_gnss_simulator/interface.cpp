@@ -28,6 +28,13 @@ void setUBXLogFile(const char * ubx_log_file)
 
 const char * getUBXLogFile(void) { return FakeGNSSSimulator::get()->getUBXLogFile(); }
 
+void setUBXPVTLogFile(const char * ubx_pvt_log_file)
+{
+  return FakeGNSSSimulator::get()->setUBXPVTLogFile(ubx_pvt_log_file);
+}
+
+const char * getUBXPVTLogFile(void) { return FakeGNSSSimulator::get()->getUBXPVTLogFile(); }
+
 void setNMEALogFile(const char * nmea_log_file)
 {
   FakeGNSSSimulator::get()->setNMEALogFile(nmea_log_file);

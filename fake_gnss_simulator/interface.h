@@ -47,6 +47,18 @@ void setUBXLogFile(const char * ubx_log_file);
 const char * getUBXLogFile(void);
 
 /**
+ * @brief Set path of UBX PVT log file for saving it to ini file
+ * @param [in] ubx_pvt_log_file path of UBX PVT log file
+ */
+void setUBXPVTLogFile(const char * ubx_pvt_log_file);
+
+/**
+ * @brief Get path of UBX PVT log file stored in ini file
+ * @return path of UBX PVT log file
+ */
+const char * getUBXPVTLogFile(void);
+
+/**
  * @brief Set path of NMEA log file for saving it to ini file
  * @param [in] nmea_log_file path of NMEA log file
  */

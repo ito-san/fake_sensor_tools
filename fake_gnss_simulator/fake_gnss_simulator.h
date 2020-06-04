@@ -54,6 +54,18 @@ public:
   const char * getUBXLogFile(void);
 
   /**
+   * @brief Set path of UBX PVT log file for saving it to ini file
+   * @param [in] ubx_pvt_log_file path of UBX PVT log file
+   */
+  void setUBXPVTLogFile(const char * ubx_pvt_log_file);
+
+  /**
+   * @brief Get path of UBX PVT log file stored in ini file
+   * @return path of UBX PVT log file
+   */
+  const char * getUBXPVTLogFile(void);
+
+  /**
    * @brief Set path of NMEA log file for saving it to ini file
    * @param [in] nmea_log_file path of NMEA log file
    */
@@ -109,6 +121,21 @@ private:
   static void * threadHelper(void * arg)
   {
     return reinterpret_cast<FakeGNSSSimulator *>(arg)->thread();
+  }
+
+  /**
+   * @brief Thread loop for sending UBX PVT
+   * @return nullptr
+   */
+  void * pvt_thread(void);
+
+  /**
+   * @brief Thread helper funcion for sending UBX PVT
+   * @param[in] arg argument
+   */
+  static void * pvt_threadHelper(void * arg)
+  {
+    return reinterpret_cast<FakeGNSSSimulator *>(arg)->pvt_thread();
   }
 
   /**
@@ -181,6 +208,7 @@ private:
   std::string ini_path_;             //!< @brief path to ini file
   char device_name_[PATH_MAX];       //!< @brief Device name
   char ubx_log_file_[PATH_MAX];      //!< @brief UBX protcol log file
+  char ubx_pvt_log_file_[PATH_MAX];  //!< @brief UBX PVT protcol log file
   char nmea_log_file_[PATH_MAX];     //!< @brief NMEA protocol log file
 
   bool stop_thread_;             //!< @brief flag to stop thread
@@ -196,6 +224,9 @@ private:
 
   fs::ifstream ifs_nmea_;  //!< @brief Input stream to operate on nmea log file
   time_t current_time_;    //!< @brief Current local time
+
+  fs::ifstream ifs_pvt_;  //!< @brief Input stream to operate on ubx pvt log file
+  pthread_t th_pvt_;      //!< @brief thread handle for sending UBX PVT
 };
 
 #endif  // FAKE_GNSS_SIMULATOR_FAKE_GNSS_SIMULATOR_H_

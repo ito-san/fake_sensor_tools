@@ -17,6 +17,7 @@
 namespace pt = boost::property_tree;
 
 static constexpr int MAX_SIZE = 1024;
+static constexpr int PVT_SIZE = 100;
 
 FakeGNSSSimulator * FakeGNSSSimulator::gnss_ = nullptr;
 
@@ -52,6 +53,11 @@ void FakeGNSSSimulator::loadIniFile(void)
     strncpy(ubx_log_file_, str, strlen(str));
   }
 
+  if (boost::optional<std::string> v = pt.get_optional<std::string>("ubx_pvt_log_file")) {
+    const char * str = v.get().c_str();
+    strncpy(ubx_pvt_log_file_, str, strlen(str));
+  }
+
   if (boost::optional<std::string> v = pt.get_optional<std::string>("nmea_log_file")) {
     const char * str = v.get().c_str();
     strncpy(nmea_log_file_, str, strlen(str));
@@ -64,6 +70,7 @@ void FakeGNSSSimulator::saveIniFile(void)
 
   pt.put("device_name", device_name_);
   pt.put("ubx_log_file", ubx_log_file_);
+  pt.put("ubx_pvt_log_file", ubx_pvt_log_file_);
   pt.put("nmea_log_file", nmea_log_file_);
 
   write_ini(ini_path_, pt);
@@ -82,6 +89,13 @@ void FakeGNSSSimulator::setUBXLogFile(const char * ubx_log_file)
 }
 
 const char * FakeGNSSSimulator::getUBXLogFile(void) { return ubx_log_file_; }
+
+void FakeGNSSSimulator::setUBXPVTLogFile(const char * ubx_pvt_log_file)
+{
+  strncpy(ubx_pvt_log_file_, ubx_pvt_log_file, strlen(ubx_pvt_log_file));
+}
+
+const char * FakeGNSSSimulator::getUBXPVTLogFile(void) { return ubx_pvt_log_file_; }
 
 void FakeGNSSSimulator::setNMEALogFile(const char * nmea_log_file)
 {
@@ -107,6 +121,13 @@ int FakeGNSSSimulator::start(void)
     return ret;
   }
 
+  ifs_pvt_.open(ubx_pvt_log_file_, std::ios::in | std::ios::binary);
+  if (!ifs_pvt_) {
+    ret = ENOENT;
+    std::cerr << strerror(ret) << std::endl;
+    return ret;
+  }
+
   // Preparation for a subsequent run() invocation
   io_.reset();
   port_ = boost::shared_ptr<as::serial_port>(new as::serial_port(io_));
@@ -123,6 +144,7 @@ int FakeGNSSSimulator::start(void)
   current_time_ = 0;
   stop_thread_ = false;
   pthread_create(&th_, nullptr, &FakeGNSSSimulator::threadHelper, this);
+  pthread_create(&th_pvt_, nullptr, &FakeGNSSSimulator::pvt_threadHelper, this);
   return ret;
 }
 
@@ -132,9 +154,11 @@ void FakeGNSSSimulator::stop(void)
   stop_thread_ = true;
   pthread_mutex_unlock(&mutex_stop_);
   pthread_join(th_, NULL);
+  pthread_join(th_pvt_, NULL);
 
   io_.stop();
   ifs_nmea_.close();
+  ifs_pvt_.close();
 }
 
 void FakeGNSSSimulator::setChecksumError(int is_error)
@@ -171,6 +195,63 @@ void * FakeGNSSSimulator::thread(void)
 
     // Send NMEA messages
     sendNMEA();
+  }
+
+  return nullptr;
+}
+
+void * FakeGNSSSimulator::pvt_thread(void)
+{
+  while (true) {
+    bool b;
+    pthread_mutex_lock(&mutex_stop_);
+    b = stop_thread_;
+    pthread_mutex_unlock(&mutex_stop_);
+    if (b) break;
+
+    // Send UBX PVT message
+    std::vector<uint8_t> frame;
+
+    frame.resize(PVT_SIZE);
+    ifs_pvt_.read(reinterpret_cast<char *>(&frame[0]), frame.size());
+    if (ifs_pvt_.eof()) {
+      ifs_pvt_.clear();
+      ifs_pvt_.seekg(0, std::ios_base::beg);
+      ifs_pvt_.read(reinterpret_cast<char *>(&frame[0]), frame.size());
+    }
+
+    time_t nowt = time(nullptr);
+    struct tm now;
+    gmtime_r(&nowt, &now);
+    int * year = reinterpret_cast<int *>(&frame[10]);
+    *year = now.tm_year + 1900;
+    frame[12] = now.tm_mon + 1;
+    frame[13] = now.tm_mday;
+    frame[14] = now.tm_hour;
+    frame[15] = now.tm_min;
+    frame[16] = now.tm_sec;
+
+    pthread_mutex_lock(&mutex_error_);
+    b = checksum_error_;
+    pthread_mutex_unlock(&mutex_error_);
+
+    if (!b) {
+      calculateChecksum(&frame[2], 96, frame[98], frame[99]);
+    } else {
+      frame[frame.size() - 1] = '?';
+      frame[frame.size() - 2] = '?';
+    }
+
+    port_->write_some(as::buffer(frame));
+    pthread_mutex_lock(&mutex_debug_);
+    b = debug_output_;
+    pthread_mutex_unlock(&mutex_debug_);
+    if (b) {
+      dump(Write, reinterpret_cast<const uint8_t *>(&frame[0]), frame.size());
+    }
+
+    // 5Hz
+    usleep(1000000 / 5);
   }
 
   return nullptr;
@@ -224,6 +305,7 @@ void FakeGNSSSimulator::handleUBX(const uint8_t * data)
   while (!ifs.eof()) {
     std::vector<uint8_t> frame;
     uint16_t length;
+    bool b;
 
     frame.resize(6);
     ifs.read(reinterpret_cast<char *>(&frame[0]), 6);
@@ -234,6 +316,14 @@ void FakeGNSSSimulator::handleUBX(const uint8_t * data)
 
     // Same message class, message id
     if (data[2] == frame[2] && data[3] == frame[3]) {
+      pthread_mutex_lock(&mutex_error_);
+      b = checksum_error_;
+      pthread_mutex_unlock(&mutex_error_);
+
+      if (b) {
+        frame[frame.size() - 1] = '?';
+        frame[frame.size() - 2] = '?';
+      }
       // asynchronously write data
       port_->async_write_some(
         as::buffer(frame), boost::bind(
@@ -258,6 +348,16 @@ void FakeGNSSSimulator::sendACK(uint8_t message_class, uint8_t message_id)
   ack[7] = message_id;
   calculateChecksum(&ack[2], 6, ack[8], ack[9]);
   std::vector<uint8_t> frame(ack, ack + 10);
+
+  bool b;
+  pthread_mutex_lock(&mutex_error_);
+  b = checksum_error_;
+  pthread_mutex_unlock(&mutex_error_);
+
+  if (b) {
+    frame[frame.size() - 1] = '?';
+    frame[frame.size() - 2] = '?';
+  }
 
   // asynchronously write data
   port_->async_write_some(
