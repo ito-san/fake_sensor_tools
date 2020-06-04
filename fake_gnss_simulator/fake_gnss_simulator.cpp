@@ -18,21 +18,21 @@ namespace pt = boost::property_tree;
 
 static constexpr int MAX_SIZE = 1024;
 
-FakeGnssSimulator * FakeGnssSimulator::gnss_ = nullptr;
+FakeGNSSSimulator * FakeGNSSSimulator::gnss_ = nullptr;
 
-FakeGnssSimulator::FakeGnssSimulator() {}
+FakeGNSSSimulator::FakeGNSSSimulator() {}
 
-FakeGnssSimulator * FakeGnssSimulator::get(void)
+FakeGNSSSimulator * FakeGNSSSimulator::get(void)
 {
   if (gnss_ == nullptr) {
-    static FakeGnssSimulator gnss;
+    static FakeGNSSSimulator gnss;
     gnss_ = &gnss;
   }
 
   return gnss_;
 }
 
-void FakeGnssSimulator::loadIniFile(void)
+void FakeGNSSSimulator::loadIniFile(void)
 {
   auto env = boost::this_process::environment();
   ini_path_ = env["HOME"].to_string() + "/.config/fake_gnss_simulator.ini";
@@ -58,7 +58,7 @@ void FakeGnssSimulator::loadIniFile(void)
   }
 }
 
-void FakeGnssSimulator::saveIniFile(void)
+void FakeGNSSSimulator::saveIniFile(void)
 {
   pt::ptree pt;
 
@@ -69,28 +69,28 @@ void FakeGnssSimulator::saveIniFile(void)
   write_ini(ini_path_, pt);
 }
 
-void FakeGnssSimulator::setDeviceName(const char * device_name)
+void FakeGNSSSimulator::setDeviceName(const char * device_name)
 {
   strncpy(device_name_, device_name, strlen(device_name));
 }
 
-const char * FakeGnssSimulator::getDeviceName(void) { return device_name_; }
+const char * FakeGNSSSimulator::getDeviceName(void) { return device_name_; }
 
-void FakeGnssSimulator::setUBXLogFile(const char * ubx_log_file)
+void FakeGNSSSimulator::setUBXLogFile(const char * ubx_log_file)
 {
   strncpy(ubx_log_file_, ubx_log_file, strlen(ubx_log_file));
 }
 
-const char * FakeGnssSimulator::getUBXLogFile(void) { return ubx_log_file_; }
+const char * FakeGNSSSimulator::getUBXLogFile(void) { return ubx_log_file_; }
 
-void FakeGnssSimulator::setNMEALogFile(const char * nmea_log_file)
+void FakeGNSSSimulator::setNMEALogFile(const char * nmea_log_file)
 {
   strncpy(nmea_log_file_, nmea_log_file, strlen(nmea_log_file));
 }
 
-const char * FakeGnssSimulator::getNMEALogFile(void) { return nmea_log_file_; }
+const char * FakeGNSSSimulator::getNMEALogFile(void) { return nmea_log_file_; }
 
-int FakeGnssSimulator::start(void)
+int FakeGNSSSimulator::start(void)
 {
   int ret = 0;
 
@@ -122,11 +122,11 @@ int FakeGnssSimulator::start(void)
 
   current_time_ = 0;
   stop_thread_ = false;
-  pthread_create(&th_, nullptr, &FakeGnssSimulator::threadHelper, this);
+  pthread_create(&th_, nullptr, &FakeGNSSSimulator::threadHelper, this);
   return ret;
 }
 
-void FakeGnssSimulator::stop(void)
+void FakeGNSSSimulator::stop(void)
 {
   pthread_mutex_lock(&mutex_stop_);
   stop_thread_ = true;
@@ -137,21 +137,21 @@ void FakeGnssSimulator::stop(void)
   ifs_nmea_.close();
 }
 
-void FakeGnssSimulator::setChecksumError(int is_error)
+void FakeGNSSSimulator::setChecksumError(int is_error)
 {
   pthread_mutex_lock(&mutex_error_);
   checksum_error_ = is_error;
   pthread_mutex_unlock(&mutex_error_);
 }
 
-void FakeGnssSimulator::setDebugOutput(int is_debug)
+void FakeGNSSSimulator::setDebugOutput(int is_debug)
 {
   pthread_mutex_lock(&mutex_debug_);
   debug_output_ = is_debug;
   pthread_mutex_unlock(&mutex_debug_);
 }
 
-void * FakeGnssSimulator::thread()
+void * FakeGNSSSimulator::thread(void)
 {
   boost::thread thr_io(boost::bind(&as::io_service::run, &io_));
 
@@ -159,7 +159,7 @@ void * FakeGnssSimulator::thread()
   uint8_t data[MAX_SIZE] = "";
   port_->async_read_some(
     as::buffer(data), boost::bind(
-                        &FakeGnssSimulator::onRead, this, as::placeholders::error,
+                        &FakeGNSSSimulator::onRead, this, as::placeholders::error,
                         as::placeholders::bytes_transferred, data));
 
   while (true) {
@@ -176,7 +176,7 @@ void * FakeGnssSimulator::thread()
   return nullptr;
 }
 
-void FakeGnssSimulator::dump(Direction dir, const uint8_t * data, std::size_t size)
+void FakeGNSSSimulator::dump(Direction dir, const uint8_t * data, std::size_t size)
 {
   printf("%s ", (dir == Read) ? ">" : "<");
 
@@ -187,7 +187,7 @@ void FakeGnssSimulator::dump(Direction dir, const uint8_t * data, std::size_t si
   printf("\n");
 }
 
-void FakeGnssSimulator::onRead(
+void FakeGNSSSimulator::onRead(
   const boost::system::error_code & error, std::size_t bytes_transfered, const uint8_t * data)
 {
   if (error) {
@@ -208,12 +208,12 @@ void FakeGnssSimulator::onRead(
     uint8_t next[MAX_SIZE] = "";
     port_->async_read_some(
       as::buffer(next), boost::bind(
-                          &FakeGnssSimulator::onRead, this, as::placeholders::error,
+                          &FakeGNSSSimulator::onRead, this, as::placeholders::error,
                           as::placeholders::bytes_transferred, next));
   }
 }
 
-void FakeGnssSimulator::handleUBX(const uint8_t * data)
+void FakeGNSSSimulator::handleUBX(const uint8_t * data)
 {
   fs::ifstream ifs;
   ifs.open(ubx_log_file_, std::ios::in | std::ios::binary);
@@ -237,7 +237,7 @@ void FakeGnssSimulator::handleUBX(const uint8_t * data)
       // asynchronously write data
       port_->async_write_some(
         as::buffer(frame), boost::bind(
-                             &FakeGnssSimulator::onWrite, this, as::placeholders::error,
+                             &FakeGNSSSimulator::onWrite, this, as::placeholders::error,
                              as::placeholders::bytes_transferred, frame));
       break;
     }
@@ -251,7 +251,7 @@ void FakeGnssSimulator::handleUBX(const uint8_t * data)
   }
 }
 
-void FakeGnssSimulator::sendACK(uint8_t message_class, uint8_t message_id)
+void FakeGNSSSimulator::sendACK(uint8_t message_class, uint8_t message_id)
 {
   uint8_t ack[] = {0xB5, 0x62, 0x05, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00};
   ack[6] = message_class;
@@ -262,11 +262,11 @@ void FakeGnssSimulator::sendACK(uint8_t message_class, uint8_t message_id)
   // asynchronously write data
   port_->async_write_some(
     as::buffer(frame), boost::bind(
-                         &FakeGnssSimulator::onWrite, this, as::placeholders::error,
+                         &FakeGNSSSimulator::onWrite, this, as::placeholders::error,
                          as::placeholders::bytes_transferred, frame));
 }
 
-void FakeGnssSimulator::calculateChecksum(
+void FakeGNSSSimulator::calculateChecksum(
   const uint8_t * data, int size, uint8_t & ck_a, uint8_t & ck_b)
 {
   ck_a = 0;
@@ -277,7 +277,7 @@ void FakeGnssSimulator::calculateChecksum(
   }
 }
 
-void FakeGnssSimulator::onWrite(
+void FakeGNSSSimulator::onWrite(
   const boost::system::error_code & error, std::size_t bytes_transfered,
   const std::vector<uint8_t> & data)
 {
@@ -290,7 +290,7 @@ void FakeGnssSimulator::onWrite(
   }
 }
 
-void FakeGnssSimulator::sendNMEA(void)
+void FakeGNSSSimulator::sendNMEA(void)
 {
   std::string line;
   std::getline(ifs_nmea_, line);
@@ -323,7 +323,7 @@ void FakeGnssSimulator::sendNMEA(void)
   }
 }
 
-void FakeGnssSimulator::waitSendingNMEA(const std::string & data)
+void FakeGNSSSimulator::waitSendingNMEA(const std::string & data)
 {
   std::string id = data.substr(1, 5);
 

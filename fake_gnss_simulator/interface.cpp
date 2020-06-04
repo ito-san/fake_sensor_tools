@@ -10,38 +10,38 @@
 extern "C" {
 #endif
 
-void loadIniFile(void) { FakeGnssSimulator::get()->loadIniFile(); }
+void loadIniFile(void) { FakeGNSSSimulator::get()->loadIniFile(); }
 
-void saveIniFile(void) { FakeGnssSimulator::get()->saveIniFile(); }
+void saveIniFile(void) { FakeGNSSSimulator::get()->saveIniFile(); }
 
 void setDeviceName(const char * device_name)
 {
-  FakeGnssSimulator::get()->setDeviceName(device_name);
+  FakeGNSSSimulator::get()->setDeviceName(device_name);
 }
 
-const char * getDeviceName(void) { return FakeGnssSimulator::get()->getDeviceName(); }
+const char * getDeviceName(void) { return FakeGNSSSimulator::get()->getDeviceName(); }
 
 void setUBXLogFile(const char * ubx_log_file)
 {
-  return FakeGnssSimulator::get()->setUBXLogFile(ubx_log_file);
+  return FakeGNSSSimulator::get()->setUBXLogFile(ubx_log_file);
 }
 
-const char * getUBXLogFile(void) { return FakeGnssSimulator::get()->getUBXLogFile(); }
+const char * getUBXLogFile(void) { return FakeGNSSSimulator::get()->getUBXLogFile(); }
 
 void setNMEALogFile(const char * nmea_log_file)
 {
-  FakeGnssSimulator::get()->setNMEALogFile(nmea_log_file);
+  FakeGNSSSimulator::get()->setNMEALogFile(nmea_log_file);
 }
 
-const char * getNMEALogFile(void) { return FakeGnssSimulator::get()->getNMEALogFile(); }
+const char * getNMEALogFile(void) { return FakeGNSSSimulator::get()->getNMEALogFile(); }
 
-int start(void) { return FakeGnssSimulator::get()->start(); }
+int start(void) { return FakeGNSSSimulator::get()->start(); }
 
-void stop(void) { FakeGnssSimulator::get()->stop(); }
+void stop(void) { FakeGNSSSimulator::get()->stop(); }
 
-void setChecksumError(int is_error) { FakeGnssSimulator::get()->setChecksumError(is_error); }
+void setChecksumError(int is_error) { FakeGNSSSimulator::get()->setChecksumError(is_error); }
 
-void setDebugOutput(int is_debug) { FakeGnssSimulator::get()->setDebugOutput(is_debug); }
+void setDebugOutput(int is_debug) { FakeGNSSSimulator::get()->setDebugOutput(is_debug); }
 
 #ifdef __cplusplus
 }

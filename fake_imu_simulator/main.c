@@ -9,7 +9,7 @@
 #include <gtk/gtk.h>
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 
-#include "fake_imu_simulator.h"
+#include <interface.h>
 
 /**
  * @brief pointers to widgets
@@ -23,8 +23,6 @@ typedef struct
   GtkWidget * w_sw_debug_output;    //!< @brief GtkSwitch
 } Widgets;
 
-INI ini;
-
 int main(int argc, char * argv[])
 {
   GtkBuilder * builder;  // Build an interface from an XML UI definition
@@ -34,7 +32,7 @@ int main(int argc, char * argv[])
   Widgets * widgets = g_slice_new(Widgets);
 
   // Load data from ini file
-  loadIniFile(&ini);
+  loadIniFile();
 
   // Initialize everything needed to operate the toolkit
   gtk_init(&argc, &argv);
@@ -52,9 +50,9 @@ int main(int argc, char * argv[])
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
 
   // Set the text in the widget
-  gtk_entry_set_text(GTK_ENTRY(widgets->w_txt_device_name), ini.device_name);
+  gtk_entry_set_text(GTK_ENTRY(widgets->w_txt_device_name), getDeviceName());
   // Set filename as the current filename for the file chooser
-  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(widgets->w_file_log_file), ini.log_file);
+  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(widgets->w_file_log_file), getLogFile());
 
   // Connect handlers to the named signals
   gtk_builder_connect_signals(builder, widgets);
@@ -83,7 +81,7 @@ void on_window_destroy(GtkWidget * object, gpointer user_data)
   gtk_main_quit();
 
   // Save data to ini file
-  saveIniFile(&ini);
+  saveIniFile();
 }
 
 /**
@@ -94,7 +92,8 @@ void on_window_destroy(GtkWidget * object, gpointer user_data)
 void on_txt_device_name_changed(GtkEditable * editable, gpointer user_data)
 {
   // Retrieve the contents of the entry widget
-  strcpy(ini.device_name, gtk_entry_get_text(GTK_ENTRY(editable)));
+  // and set device name for saving it to ini file
+  setDeviceName(gtk_entry_get_text(GTK_ENTRY(editable)));
 }
 
 /**
@@ -105,7 +104,8 @@ void on_txt_device_name_changed(GtkEditable * editable, gpointer user_data)
 void on_file_log_file_selection_changed(GtkFileChooser * chooser, gpointer user_data)
 {
   // Get the filename for the currently selected file in the file selector
-  strcpy(ini.log_file, gtk_file_chooser_get_filename(chooser));
+  // and set path of log file for saving it to ini file
+  setLogFile(gtk_file_chooser_get_filename(chooser));
 }
 
 /**
@@ -119,7 +119,7 @@ gboolean on_sw_serial_port_state_set(GtkSwitch * widget, gboolean state, gpointe
 {
   if (state) {
     // Start serial port communication
-    if (start(&ini) == 0) {
+    if (start() == 0) {
       // Set the sensitivity of a widget
       gtk_widget_set_sensitive(user_data, TRUE);
     }

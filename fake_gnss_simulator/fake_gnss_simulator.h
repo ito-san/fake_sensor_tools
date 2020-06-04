@@ -15,10 +15,10 @@
 namespace as = boost::asio;
 namespace fs = boost::filesystem;
 
-class FakeGnssSimulator
+class FakeGNSSSimulator
 {
 public:
-  static FakeGnssSimulator * get();
+  static FakeGNSSSimulator * get();
 
   /**
    * @brief Load data from ini file
@@ -100,7 +100,7 @@ private:
   /**
    * @brief Constructor
    */
-  FakeGnssSimulator();
+  FakeGNSSSimulator();
 
   /**
    * @brief Thread helper funcion
@@ -108,17 +108,20 @@ private:
    */
   static void * threadHelper(void * arg)
   {
-    return reinterpret_cast<FakeGnssSimulator *>(arg)->thread();
+    return reinterpret_cast<FakeGNSSSimulator *>(arg)->thread();
   }
 
   /**
    * @brief Thread loop
    * @return nullptr
    */
-  void * thread();
+  void * thread(void);
 
   /**
    * @brief Dump sent/received Data
+   * @param[in] dir io direction
+   * @param[in] data pointer to data
+   * @param[in] size size of data
    */
   void dump(Direction dir, const uint8_t * data, std::size_t size);
 
@@ -174,7 +177,7 @@ private:
    */
   void waitSendingNMEA(const std::string & data);
 
-  static FakeGnssSimulator * gnss_;  //!< @brief reference to itself
+  static FakeGNSSSimulator * gnss_;  //!< @brief reference to itself
   std::string ini_path_;             //!< @brief path to ini file
   char device_name_[PATH_MAX];       //!< @brief Device name
   char ubx_log_file_[PATH_MAX];      //!< @brief UBX protcol log file
