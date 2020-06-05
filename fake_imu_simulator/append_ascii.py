@@ -22,7 +22,7 @@ def main():
       data.fromfile(r, 44)
       frame.extend(data)
       sum = 0
-      for i in range(1,52):
+      for i in range(1,53):
         sum = sum ^ frame[i]
       frame.extend("*{:02X}\r\n".format(sum))
       w.write(frame)
@@ -38,7 +38,7 @@ def main():
 
         frame.extend(data)
         sum = 0
-        for i in range(1,52):
+        for i in range(1,53):
           sum = sum ^ frame[i]
         frame.extend("*{:02X}\r\n".format(sum))
         w.write(frame)
