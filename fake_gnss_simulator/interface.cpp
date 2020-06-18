@@ -14,33 +14,13 @@ void loadIniFile(void) { FakeGNSSSimulator::get()->loadIniFile(); }
 
 void saveIniFile(void) { FakeGNSSSimulator::get()->saveIniFile(); }
 
+// General
 void setDeviceName(const char * device_name)
 {
   FakeGNSSSimulator::get()->setDeviceName(device_name);
 }
 
 const char * getDeviceName(void) { return FakeGNSSSimulator::get()->getDeviceName(); }
-
-void setUBXLogFile(const char * ubx_log_file)
-{
-  return FakeGNSSSimulator::get()->setUBXLogFile(ubx_log_file);
-}
-
-const char * getUBXLogFile(void) { return FakeGNSSSimulator::get()->getUBXLogFile(); }
-
-void setUBXPVTLogFile(const char * ubx_pvt_log_file)
-{
-  return FakeGNSSSimulator::get()->setUBXPVTLogFile(ubx_pvt_log_file);
-}
-
-const char * getUBXPVTLogFile(void) { return FakeGNSSSimulator::get()->getUBXPVTLogFile(); }
-
-void setNMEALogFile(const char * nmea_log_file)
-{
-  FakeGNSSSimulator::get()->setNMEALogFile(nmea_log_file);
-}
-
-const char * getNMEALogFile(void) { return FakeGNSSSimulator::get()->getNMEALogFile(); }
 
 int start(void) { return FakeGNSSSimulator::get()->start(); }
 
@@ -49,6 +29,37 @@ void stop(void) { FakeGNSSSimulator::get()->stop(); }
 void setChecksumError(int is_error) { FakeGNSSSimulator::get()->setChecksumError(is_error); }
 
 void setDebugOutput(int is_debug) { FakeGNSSSimulator::get()->setDebugOutput(is_debug); }
+
+// UBX-MON-HW
+void setAStatus(AStatus aStatus) { FakeGNSSSimulator::get()->setAStatus(aStatus); }
+
+AStatus getAStatus(void) { return FakeGNSSSimulator::get()->getAStatus(); }
+
+void setJammingState(JammingState jammingState)
+{
+  FakeGNSSSimulator::get()->setJammingState(jammingState);
+}
+
+JammingState getJammingState(void) { return FakeGNSSSimulator::get()->getJammingState(); }
+
+// UBX-MON-COMMS
+void setPortId(PortId portId) { FakeGNSSSimulator::get()->setPortId(portId); }
+
+PortId getPortId(void) { return FakeGNSSSimulator::get()->getPortId(); }
+
+PortBlock getPortBlock(void) { return FakeGNSSSimulator::get()->getPortBlock(); }
+
+void setPortEnabled(int port_enabled) { FakeGNSSSimulator::get()->setPortEnabled(port_enabled); }
+
+void setTxUsage(int tx_usage) { FakeGNSSSimulator::get()->setTxUsage(tx_usage); }
+
+// UBX-NAV-STATUS
+void setSpoofDetState(SpoofDetState spoofDetState)
+{
+  FakeGNSSSimulator::get()->setSpoofDetState(spoofDetState);
+}
+
+SpoofDetState getSpoofDetState(void) { return FakeGNSSSimulator::get()->getSpoofDetState(); }
 
 #ifdef __cplusplus
 }

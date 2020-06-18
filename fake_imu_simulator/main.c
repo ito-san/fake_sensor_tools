@@ -16,12 +16,51 @@
  */
 typedef struct
 {
-  GtkWidget * w_txt_device_name;    //!< @brief GtkEntry
-  GtkWidget * w_file_log_file;      //!< @brief GtkFileChooserButton
-  GtkWidget * w_sw_serial_port;     //!< @brief GtkSwitch
-  GtkWidget * w_sw_checksum_error;  //!< @brief GtkSwitch
-  GtkWidget * w_sw_debug_output;    //!< @brief GtkSwitch
+  GtkWidget * hbr_header;  //!< @brief GtkHeaderBar
+  GtkWidget * sbar_list;   //!< @brief GtkStackSidebar
+  GtkWidget * stk_base;    //!< @brief GtkStack
+
+  GtkWidget * grd_general;        //!< @brief GtkGrid
+  GtkWidget * txt_device_name;    //!< @brief GtkEntry
+  GtkWidget * sw_serial_port;     //!< @brief GtkSwitch
+  GtkWidget * sw_checksum_error;  //!< @brief GtkSwitch
+  GtkWidget * sw_debug_output;    //!< @brief GtkSwitch
+
+  GtkWidget * grd_bin;        //!< @brief GtkGrid
+  GtkWidget * file_log_file;  //!< @brief GtkFileChooserButton
 } Widgets;
+
+void initGeneral(GtkBuilder * b, Widgets * w)
+{
+  w->grd_general = GTK_WIDGET(gtk_builder_get_object(b, "grd_general"));
+  w->txt_device_name = GTK_WIDGET(gtk_builder_get_object(b, "txt_device_name"));
+  w->sw_serial_port = GTK_WIDGET(gtk_builder_get_object(b, "sw_serial_port"));
+  w->sw_checksum_error = GTK_WIDGET(gtk_builder_get_object(b, "sw_checksum_error"));
+  w->sw_debug_output = GTK_WIDGET(gtk_builder_get_object(b, "sw_debug_output"));
+
+  // Adds a child to stack
+  gtk_stack_add_named(GTK_STACK(w->stk_base), w->grd_general, "General");
+  // Sets one or more child properties for child and container
+  gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_general, "title", "General", NULL);
+
+  // Set the text in the widget
+  gtk_entry_set_text(GTK_ENTRY(w->txt_device_name), getDeviceName());
+}
+
+void initBIN(GtkBuilder * b, Widgets * w)
+{
+  // Get the object
+  w->grd_bin = GTK_WIDGET(gtk_builder_get_object(b, "grd_bin"));
+  w->file_log_file = GTK_WIDGET(gtk_builder_get_object(b, "file_log_file"));
+
+  // Adds a child to stack
+  gtk_stack_add_named(GTK_STACK(w->stk_base), w->grd_bin, "BIN");
+  // Sets one or more child properties for child and container
+  gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_bin, "title", "BIN", NULL);
+
+  // Set filename as the current filename for the file chooser
+  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_log_file), getLogFile());
+}
 
 int main(int argc, char * argv[])
 {
@@ -40,19 +79,17 @@ int main(int argc, char * argv[])
   builder = gtk_builder_new_from_file("fake_imu_simulator.glade");
   // Get the object
   window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
-  widgets->w_txt_device_name = GTK_WIDGET(gtk_builder_get_object(builder, "txt_device_name"));
-  widgets->w_file_log_file = GTK_WIDGET(gtk_builder_get_object(builder, "file_log_file"));
-  widgets->w_sw_serial_port = GTK_WIDGET(gtk_builder_get_object(builder, "sw_serial_port"));
-  widgets->w_sw_checksum_error = GTK_WIDGET(gtk_builder_get_object(builder, "sw_checksum_error"));
-  widgets->w_sw_debug_output = GTK_WIDGET(gtk_builder_get_object(builder, "sw_debug_output"));
+  widgets->hbr_header = GTK_WIDGET(gtk_builder_get_object(builder, "hbr_header"));
+  widgets->sbar_list = GTK_WIDGET(gtk_builder_get_object(builder, "sbar_list"));
+  widgets->stk_base = GTK_WIDGET(gtk_builder_get_object(builder, "stk_base"));
+
+  // General
+  initGeneral(builder, widgets);
+  // BIN
+  initBIN(builder, widgets);
 
   // Set a position constraint for this window
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
-
-  // Set the text in the widget
-  gtk_entry_set_text(GTK_ENTRY(widgets->w_txt_device_name), getDeviceName());
-  // Set filename as the current filename for the file chooser
-  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(widgets->w_file_log_file), getLogFile());
 
   // Connect handlers to the named signals
   gtk_builder_connect_signals(builder, widgets);
@@ -82,6 +119,16 @@ void on_window_destroy(GtkWidget * object, gpointer user_data)
 
   // Save data to ini file
   saveIniFile();
+}
+
+/**
+ * @brief Emitted when widget is going to be mapped, that is when the widget is visible
+ * @param [in] widget the object which received the signal
+ * @param [in] user_data user data set when the signal handler was connected
+ */
+void on_grd_map(GtkWidget * widget, gpointer user_data)
+{
+  gtk_header_bar_set_title(GTK_HEADER_BAR(user_data), gtk_widget_get_name(widget));
 }
 
 /**

@@ -6,6 +6,7 @@
  * @brief Interfacing to C++ code
  */
 
+#include <defines.h>
 #include <linux/limits.h>
 
 #ifdef __cplusplus
@@ -22,6 +23,7 @@ void loadIniFile(void);
  */
 void saveIniFile(void);
 
+// General
 /**
  * @brief Set device name for saving it to ini file
  * @param [in] device_name device name
@@ -33,42 +35,6 @@ void setDeviceName(const char * device_name);
  * @return device name
  */
 const char * getDeviceName(void);
-
-/**
- * @brief Set path of UBX log file for saving it to ini file
- * @param [in] ubx_log_file path of UBX log file
- */
-void setUBXLogFile(const char * ubx_log_file);
-
-/**
- * @brief Get path of UBX log file stored in ini file
- * @return path of UBX log file
- */
-const char * getUBXLogFile(void);
-
-/**
- * @brief Set path of UBX PVT log file for saving it to ini file
- * @param [in] ubx_pvt_log_file path of UBX PVT log file
- */
-void setUBXPVTLogFile(const char * ubx_pvt_log_file);
-
-/**
- * @brief Get path of UBX PVT log file stored in ini file
- * @return path of UBX PVT log file
- */
-const char * getUBXPVTLogFile(void);
-
-/**
- * @brief Set path of NMEA log file for saving it to ini file
- * @param [in] nmea_log_file path of NMEA log file
- */
-void setNMEALogFile(const char * nmea_log_file);
-
-/**
- * @brief Get path of NMEA log file stored in ini file
- * @return path of NMEA log file
- */
-const char * getNMEALogFile(void);
 
 /**
  * @brief Start serial port communication
@@ -92,6 +58,75 @@ void setChecksumError(int is_error);
  * @param [in] is_debug debug output or not
  */
 void setDebugOutput(int is_debug);
+
+// UBX-MON-HW
+/**
+ * @brief Set aStatus
+ * @param [in] aStatus aStatus
+ */
+void setAStatus(AStatus aStatus);
+
+/**
+ * @brief Get aStatus
+ * @return aStatus
+ */
+AStatus getAStatus(void);
+
+/**
+ * @brief Set jammingState
+ * @param [in] jammingState jammingState
+ */
+void setJammingState(JammingState jammingState);
+
+/**
+ * @brief Get jammingState
+ * @return jammingState
+ */
+JammingState getJammingState(void);
+
+// UBX-MON-COMMS
+/**
+ * @brief Set port id
+ * @param [in] portId portId
+ */
+void setPortId(PortId portId);
+
+/**
+ * @brief Get port id
+ * @return Port block
+ */
+PortId getPortId(void);
+
+/**
+ * @brief Get port block
+ * @return Port block
+ */
+PortBlock getPortBlock(void);
+
+/**
+ * @brief Set port enabled
+ * @param [in] port_enabled port enabled
+ */
+void setPortEnabled(int port_enabled);
+
+/**
+ * @brief Set txUsage
+ * @param [in] tx_usage txUsage
+ */
+void setTxUsage(int tx_usage);
+
+// UBX-NAV-STATUS
+/**
+ * @brief Set spoofDetState
+ * @param [in] spoofDetState spoofDetState
+ */
+void setSpoofDetState(SpoofDetState spoofDetState);
+
+/**
+ * @brief Get spoofDetState
+ * @return spoofDetState
+ */
+SpoofDetState getSpoofDetState(void);
 
 #ifdef __cplusplus
 }

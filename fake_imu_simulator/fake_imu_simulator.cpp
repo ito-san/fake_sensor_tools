@@ -1,20 +1,25 @@
 #include <fake_imu_simulator.h>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <boost/process.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
+#include <boost/thread.hpp>
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;
 
-static constexpr int MAX_SIZE = 58;
+static constexpr int MAX_SIZE = 1024;
+static constexpr int MAX_BIN_SIZE = 58;
 
 FakeIMUSimulator * FakeIMUSimulator::imu_ = nullptr;
 
-FakeIMUSimulator::FakeIMUSimulator() {}
+FakeIMUSimulator::FakeIMUSimulator() : bin_req_(false) {}
 
 FakeIMUSimulator * FakeIMUSimulator::get(void)
 {
@@ -74,12 +79,6 @@ const char * FakeIMUSimulator::getLogFile(void) { return log_file_; }
 int FakeIMUSimulator::start(void)
 {
   int ret = 0;
-  fd_ = open(device_name_, O_WRONLY);
-  if (fd_ < 0) {
-    ret = errno;
-    std::cerr << strerror(ret) << std::endl;
-    return ret;
-  }
 
   if (!fs::exists(log_file_)) {
     ret = ENOENT;
@@ -87,6 +86,20 @@ int FakeIMUSimulator::start(void)
     return ret;
   }
 
+  // Preparation for a subsequent run() invocation
+  io_.reset();
+  port_ = boost::shared_ptr<as::serial_port>(new as::serial_port(io_));
+
+  // Open the serial port using the specified device name
+  try {
+    port_->open(device_name_);
+  } catch (const boost::system::system_error & e) {
+    ret = ENOENT;
+    std::cerr << e.what() << std::endl;
+    return ret;
+  }
+
+  bin_req_ = false;
   stop_thread_ = false;
   pthread_create(&th_, nullptr, &FakeIMUSimulator::threadHelper, this);
   return ret;
@@ -99,7 +112,7 @@ void FakeIMUSimulator::stop()
   pthread_mutex_unlock(&mutex_stop_);
   pthread_join(th_, NULL);
 
-  close(fd_);
+  io_.stop();
 }
 
 void FakeIMUSimulator::setChecksumError(int is_error)
@@ -111,13 +124,22 @@ void FakeIMUSimulator::setChecksumError(int is_error)
 
 void FakeIMUSimulator::setDebugOutput(int is_debug)
 {
-  pthread_mutex_lock(&mutex_debug_);
-  debug_output_ = is_debug;
-  pthread_mutex_unlock(&mutex_debug_);
+  pthread_mutex_lock(&mutex_dump_);
+  dump_ = is_debug;
+  pthread_mutex_unlock(&mutex_dump_);
 }
 
 void * FakeIMUSimulator::thread(void)
 {
+  boost::thread thr_io(boost::bind(&as::io_service::run, &io_));
+
+  // asynchronously read data
+  uint8_t data[MAX_SIZE] = "";
+  port_->async_read_some(
+    as::buffer(data), boost::bind(
+                        &FakeIMUSimulator::onRead, this, as::placeholders::error,
+                        as::placeholders::bytes_transferred, data));
+
   fs::ifstream ifs(log_file_, std::ios::in | std::ios::binary);
   if (!ifs) {
     return nullptr;
@@ -130,31 +152,33 @@ void * FakeIMUSimulator::thread(void)
     pthread_mutex_unlock(&mutex_stop_);
     if (b) break;
 
-    uint8_t data[MAX_SIZE] = "";
-    ifs.read(reinterpret_cast<char *>(data), sizeof(data));
-    if (ifs.eof()) {
-      ifs.clear();
-      ifs.seekg(0, std::ios_base::beg);
-      ifs.read(reinterpret_cast<char *>(data), sizeof(data));
+    if (bin_req_) {
+      uint8_t data[MAX_BIN_SIZE] = {};
+      int len = sizeof(data);
+      ifs.read(reinterpret_cast<char *>(data), len);
+      if (ifs.eof()) {
+        ifs.clear();
+        ifs.seekg(0, std::ios_base::beg);
+        ifs.read(reinterpret_cast<char *>(data), len);
+      }
+
+      pthread_mutex_lock(&mutex_error_);
+      b = checksum_error_;
+      pthread_mutex_unlock(&mutex_error_);
+
+      if (b) {
+        data[len - 3] = '?';
+        data[len - 4] = '?';
+      }
+
+      std::vector<uint8_t> frame(data, data + len);
+      // asynchronously write data
+      port_->async_write_some(
+        as::buffer(frame), boost::bind(
+                             &FakeIMUSimulator::onWrite, this, as::placeholders::error,
+                             as::placeholders::bytes_transferred, frame));
     }
 
-    pthread_mutex_lock(&mutex_error_);
-    b = checksum_error_;
-    pthread_mutex_unlock(&mutex_error_);
-
-    if (b) {
-      data[MAX_SIZE - 3] = '?';
-      data[MAX_SIZE - 4] = '?';
-    }
-
-    write(fd_, data, sizeof(data));
-
-    pthread_mutex_lock(&mutex_debug_);
-    b = debug_output_;
-    pthread_mutex_unlock(&mutex_debug_);
-    if (b) {
-      dump(data);
-    }
     // 30Hz
     usleep(1000000 / 30);
   }
@@ -164,7 +188,18 @@ void * FakeIMUSimulator::thread(void)
   return nullptr;
 }
 
-void FakeIMUSimulator::dump(const uint8_t * data)
+void FakeIMUSimulator::dump(Direction dir, const uint8_t * data, std::size_t size)
+{
+  printf("%s ", (dir == Read) ? ">" : "<");
+
+  for (std::size_t i = 0; i < size; ++i) {
+    printf("%02X", data[i]);
+    if (i + 1 <= size) printf(" ");
+  }
+  printf("\n");
+}
+
+void FakeIMUSimulator::dumpBIN(const uint8_t * data)
 {
   printf(
     "< %c%c%c%c%c%c%c%c%c", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7],
@@ -182,4 +217,47 @@ void FakeIMUSimulator::dump(const uint8_t * data)
   printf(" %02X%02X%02X%02X%02X%02X", data[45], data[46], data[47], data[48], data[49], data[50]);
   printf(" %02X%02X", data[51], data[52]);
   printf("%c%c%c%c%c", data[53], data[54], data[55], data[56], data[57]);
+}
+
+void FakeIMUSimulator::onRead(
+  const boost::system::error_code & error, std::size_t bytes_transfered, const uint8_t * data)
+{
+  if (error) {
+    std::cout << error.message() << std::endl;
+  } else {
+    bool b;
+    pthread_mutex_lock(&mutex_dump_);
+    b = dump_;
+    pthread_mutex_unlock(&mutex_dump_);
+    if (b) {
+      dump(Read, data, bytes_transfered);
+    }
+
+    std::string str(data, data + bytes_transfered);
+    boost::remove_erase_if(str, boost::is_any_of("\r\n"));
+
+    if (str == "$TSC,BIN,30") {
+      bin_req_ = true;
+    }
+
+    // asynchronously read data
+    uint8_t next[MAX_SIZE] = "";
+    port_->async_read_some(
+      as::buffer(next), boost::bind(
+                          &FakeIMUSimulator::onRead, this, as::placeholders::error,
+                          as::placeholders::bytes_transferred, next));
+  }
+}
+
+void FakeIMUSimulator::onWrite(
+  const boost::system::error_code & error, std::size_t bytes_transfered,
+  const std::vector<uint8_t> & data)
+{
+  bool b;
+  pthread_mutex_lock(&mutex_dump_);
+  b = dump_;
+  pthread_mutex_unlock(&mutex_dump_);
+  if (b) {
+    dumpBIN(&data[0]);
+  }
 }

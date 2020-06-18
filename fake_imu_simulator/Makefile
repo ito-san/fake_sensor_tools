@@ -10,7 +10,7 @@ TARGET      = $(CURDIR)/fake_imu_simulator
 OBJS        = $(OBJDIR)/fake_imu_simulator.o $(OBJDIR)/interface.o $(OBJDIR)/main.o
 PACKAGE     = `pkg-config --cflags --libs gtk+-3.0`
 LDFLAGS     = $(PACKAGE) -export-dynamic
-LDFLAGS     += -lstdc++ -lboost_system -lboost_filesystem
+LDFLAGS     += -lstdc++ -lboost_system -lboost_filesystem -lboost_thread
 
 .PHONY : target
 target: $(TARGET)

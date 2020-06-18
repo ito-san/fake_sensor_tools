@@ -1,205 +1,371 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="3.14"/>
-  <object class="GtkWindow" id="window">
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkAdjustment" id="adj_tx_usage">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+    <signal name="value-changed" handler="on_adj_tx_usage_value_changed" swapped="no"/>
+  </object>
+  <object class="GtkGrid" id="grd_ubx_mon_comms">
+    <property name="name">UBX-MON-COMMS</property>
+    <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="border_width">15</property>
-    <property name="title" translatable="yes">Fake GNSS Simulator</property>
+    <child>
+      <object class="GtkComboBoxText" id="cmb_port_id">
+        <property name="width_request">250</property>
+        <property name="height_request">20</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <signal name="changed" handler="on_cmb_port_id_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="width_request">55</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">portId:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">txUsage:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_top">5</property>
+        <property name="label" translatable="yes">enabled:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_top">5</property>
+        <child>
+          <object class="GtkSwitch" id="sw_port_enabled">
+            <property name="width_request">40</property>
+            <property name="height_request">20</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <signal name="state-set" handler="on_sw_port_enabled_state_set" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkScale">
+            <property name="width_request">250</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="adjustment">adj_tx_usage</property>
+            <property name="round_digits">1</property>
+            <property name="digits">0</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">2</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkGrid" id="grd_general">
+    <property name="name">General</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">15</property>
+    <property name="row_spacing">5</property>
+    <property name="column_spacing">5</property>
+    <signal name="map" handler="on_grd_map" object="hbr_header" swapped="no"/>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Device name:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkEntry" id="txt_device_name">
+        <property name="width_request">250</property>
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <signal name="changed" handler="on_txt_device_name_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Serial port:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Checksum error:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkSwitch" id="sw_serial_port">
+            <property name="width_request">40</property>
+            <property name="height_request">20</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <signal name="state-set" handler="on_sw_serial_port_state_set" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkSwitch" id="sw_checksum_error">
+            <property name="width_request">40</property>
+            <property name="height_request">20</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <signal name="state-set" handler="on_sw_checksum_error_state_set" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Debug output:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">3</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkSwitch" id="sw_debug_output">
+            <property name="width_request">40</property>
+            <property name="height_request">20</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <signal name="state-set" handler="on_sw_debug_output_state_set" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">3</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkGrid" id="grd_ubx_mon_hw">
+    <property name="name">UBX-MON-HW</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">15</property>
+    <property name="row_spacing">5</property>
+    <property name="column_spacing">5</property>
+    <signal name="map" handler="on_grd_map" object="hbr_header" swapped="no"/>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">aStatus:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">jammingState:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkComboBoxText" id="cmb_a_status">
+        <property name="width_request">250</property>
+        <property name="height_request">20</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <signal name="changed" handler="on_cmb_a_status_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkComboBoxText" id="cmb_jamming_state">
+        <property name="width_request">250</property>
+        <property name="height_request">20</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <signal name="changed" handler="on_cmb_jamming_state_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkGrid" id="grd_ubx_nav_state">
+    <property name="name">UBX-NAV-STATUS</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">15</property>
+    <property name="row_spacing">5</property>
+    <property name="column_spacing">5</property>
+    <signal name="map" handler="on_grd_map" object="hbr_header" swapped="no"/>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">spoofDetState:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkComboBoxText" id="cmb_spoof_det_state">
+        <property name="width_request">250</property>
+        <property name="height_request">20</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <signal name="changed" handler="on_cmb_spoof_det_state_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkApplicationWindow" id="window">
+    <property name="can_focus">False</property>
+    <property name="border_width">15</property>
     <property name="icon">fake_gnss_simulator.png</property>
     <signal name="destroy" handler="on_window_destroy" swapped="no"/>
     <child type="titlebar">
-      <placeholder/>
-    </child>
-    <child>
-      <object class="GtkGrid">
+      <object class="GtkHeaderBar" id="hbr_header">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="row_spacing">5</property>
-        <property name="column_spacing">5</property>
+        <property name="show_close_button">True</property>
         <child>
-          <object class="GtkLabel">
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkPaned">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <child>
+          <object class="GtkStackSidebar" id="sbar_list">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Device name:</property>
-            <property name="justify">right</property>
-            <property name="single_line_mode">True</property>
+            <property name="stack">stk_base</property>
           </object>
           <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
+            <property name="resize">False</property>
+            <property name="shrink">True</property>
           </packing>
         </child>
         <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">UBX log file:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFileChooserButton" id="file_ubx_log_file">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="title" translatable="yes"/>
-            <signal name="selection-changed" handler="on_file_ubx_log_file_selection_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="txt_device_name">
-            <property name="width_request">250</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <signal name="changed" handler="on_txt_device_name_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Debug output:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">6</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFixed">
+          <object class="GtkStack" id="stk_base">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkSwitch" id="sw_debug_output">
-                <property name="width_request">40</property>
-                <property name="height_request">20</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <signal name="state-set" handler="on_sw_debug_output_state_set" swapped="no"/>
-              </object>
+              <placeholder/>
             </child>
           </object>
           <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">6</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Checksum error:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">5</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFixed">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkSwitch" id="sw_checksum_error">
-                <property name="width_request">40</property>
-                <property name="height_request">20</property>
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">True</property>
-                <signal name="state-set" handler="on_sw_checksum_error_state_set" swapped="no"/>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">5</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Serial port:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">4</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFixed">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkSwitch" id="sw_serial_port">
-                <property name="width_request">40</property>
-                <property name="height_request">20</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <signal name="state-set" handler="on_sw_serial_port_state_set" object="sw_checksum_error" swapped="no"/>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">4</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">NMEA log file:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFileChooserButton" id="file_nmea_log_file">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="title" translatable="yes"/>
-            <signal name="selection-changed" handler="on_file_nmea_log_file_selection_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">UBX PVT log file:</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFileChooserButton" id="file_ubx_pvt_log_file">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="title" translatable="yes"/>
-            <signal name="selection-changed" handler="on_file_ubx_pvt_log_file_selection_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">2</property>
+            <property name="resize">True</property>
+            <property name="shrink">True</property>
           </packing>
         </child>
       </object>

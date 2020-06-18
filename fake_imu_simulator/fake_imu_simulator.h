@@ -7,7 +7,10 @@
  */
 
 #include <linux/limits.h>
+#include <boost/asio.hpp>
 #include <string>
+
+namespace as = boost::asio;
 
 class FakeIMUSimulator
 {
@@ -72,6 +75,14 @@ public:
 
 private:
   /**
+   * @brief io direction
+   */
+  enum Direction {
+    Read = 0,
+    Write,
+  };
+
+  /**
    * @brief Constructor
    */
   FakeIMUSimulator();
@@ -93,24 +104,55 @@ private:
 
   /**
    * @brief Dump sent/received Data
+   * @param[in] dir io direction
+   * @param[in] data pointer to data
+   * @param[in] size size of data
+   */
+  void dump(Direction dir, const uint8_t * data, std::size_t size);
+
+  /**
+   * @brief Dump received BIN Data
    * @param[in] data pointer to data
    */
-  void dump(const uint8_t * data);
+  void dumpBIN(const uint8_t * data);
 
-  static FakeIMUSimulator * imu_;  //!< @brief reference to itself
-  std::string ini_path_;           //!< @brief path to ini file
-  char device_name_[PATH_MAX];     //!< @brief Device name
-  char log_file_[PATH_MAX];        //!< @brief log file
+  /**
+   * @brief Handler to be called when the read operation completes
+   * @param[in] error error argument of a handler
+   * @param[in] bytes_transfered bytes transferred argument of a handler
+   * @param[inout] data received data
+   */
+  void onRead(
+    const boost::system::error_code & error, std::size_t bytes_transfered, const uint8_t * data);
 
-  bool stop_thread_;             //!< @brief flag to stop thread
-  bool checksum_error_;          //!< @brief flag to generate checksum error occur or not
-  bool debug_output_;            //!< @brief flag to show debug output or not
-  pthread_mutex_t mutex_stop_;   //!< @brief mutex to protect access to stop_thread
-  pthread_mutex_t mutex_error_;  //!< @brief mutex to protect access to checksum_error
-  pthread_mutex_t mutex_debug_;  //!< @brief mutex to protect access to debug_output
-  pthread_t th_;                 //!< @brief thread handle
+  /**
+   * @brief Handler to be called when the write operation completes
+   * @param[in] error error argument of a handler
+   * @param[in] bytes_transfered bytes transferred argument of a handler
+   * @param[inout] data sent data
+   */
+  void onWrite(
+    const boost::system::error_code & error, std::size_t bytes_transfered,
+    const std::vector<uint8_t> & data);
 
-  int fd_;  //!< @brief file descriptor to serial port
+  static FakeIMUSimulator * imu_;            //!< @brief reference to itself
+  std::string ini_path_;                     //!< @brief path to ini file
+  as::io_service io_;                        //!< @brief facilities of custom asynchronous services
+  boost::shared_ptr<as::serial_port> port_;  //!< @brief wrapper over serial port functionality
+  pthread_mutex_t mutex_stop_;               //!< @brief mutex to protect access to stop_thread
+  pthread_mutex_t mutex_error_;              //!< @brief mutex to protect access to checksum_error
+  pthread_mutex_t mutex_dump_;               //!< @brief mutex to protect access to dump flag
+  pthread_t th_;                             //!< @brief thread handle
+
+  // General
+  char device_name_[PATH_MAX];  //!< @brief Device name
+  bool stop_thread_;            //!< @brief flag to stop thread
+  bool checksum_error_;         //!< @brief flag to generate checksum error occur or not
+  bool dump_;                   //!< @brief flag to show debug output or not
+
+  // BIN
+  char log_file_[PATH_MAX];  //!< @brief log file
+  bool bin_req_;             //!< @brief flag of BIN request received
 };
 
 #endif  // FAKE_IMU_SIMULATOR_FAKE_IMU_SIMULATOR_H_
