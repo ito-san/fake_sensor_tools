@@ -62,19 +62,13 @@ void FakeIMUSimulator::saveIniFile(void)
   write_ini(ini_path_, pt);
 }
 
+// General
 void FakeIMUSimulator::setDeviceName(const char * device_name)
 {
   strncpy(device_name_, device_name, strlen(device_name));
 }
 
-const char * FakeIMUSimulator::getDeviceName(void) { return device_name_; }
-
-void FakeIMUSimulator::setLogFile(const char * log_file)
-{
-  strncpy(log_file_, log_file, strlen(log_file));
-}
-
-const char * FakeIMUSimulator::getLogFile(void) { return log_file_; }
+const char * FakeIMUSimulator::getDeviceName(void) const { return device_name_; }
 
 int FakeIMUSimulator::start(void)
 {
@@ -128,6 +122,13 @@ void FakeIMUSimulator::setDebugOutput(int is_debug)
   dump_ = is_debug;
   pthread_mutex_unlock(&mutex_dump_);
 }
+
+void FakeIMUSimulator::setLogFile(const char * log_file)
+{
+  strncpy(log_file_, log_file, strlen(log_file));
+}
+
+const char * FakeIMUSimulator::getLogFile(void) const { return log_file_; }
 
 void * FakeIMUSimulator::thread(void)
 {

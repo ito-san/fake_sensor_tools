@@ -9,6 +9,7 @@
 #include <linux/limits.h>
 #include <boost/asio.hpp>
 #include <string>
+#include <vector>
 
 namespace as = boost::asio;
 
@@ -26,6 +27,8 @@ public:
    * @brief Save data to ini file
    */
   void saveIniFile(void);
+
+  // General
   /**
    * @brief Set device name for saving it to ini file
    * @param [in] device_name device name
@@ -36,19 +39,7 @@ public:
    * @brief Get device name stored in ini file
    * @return device name
    */
-  const char * getDeviceName(void);
-
-  /**
-   * @brief Set path of log file for saving it to ini file
-   * @param [in] log_file path of log file
-   */
-  void setLogFile(const char * log_file);
-
-  /**
-   * @brief Get path of log file stored in ini file
-   * @return path of log file
-   */
-  const char * getLogFile(void);
+  const char * getDeviceName(void) const;
 
   /**
    * @brief Start serial port communication
@@ -72,6 +63,19 @@ public:
    * @param [in] is_debug debug output or not
    */
   void setDebugOutput(int is_debug);
+
+  // BIN
+  /**
+   * @brief Set path of log file for saving it to ini file
+   * @param [in] log_file path of log file
+   */
+  void setLogFile(const char * log_file);
+
+  /**
+   * @brief Get path of log file stored in ini file
+   * @return path of log file
+   */
+  const char * getLogFile(void) const;
 
 private:
   /**

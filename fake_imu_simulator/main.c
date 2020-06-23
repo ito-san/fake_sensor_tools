@@ -131,6 +131,7 @@ void on_grd_map(GtkWidget * widget, gpointer user_data)
   gtk_header_bar_set_title(GTK_HEADER_BAR(user_data), gtk_widget_get_name(widget));
 }
 
+// General
 /**
  * @brief Emitted at the end of a single user-visible operation on the contents
  * @param [in] editable the object which received the signal
@@ -141,18 +142,6 @@ void on_txt_device_name_changed(GtkEditable * editable, gpointer user_data)
   // Retrieve the contents of the entry widget
   // and set device name for saving it to ini file
   setDeviceName(gtk_entry_get_text(GTK_ENTRY(editable)));
-}
-
-/**
- * @brief Emitted when there is a change in the set of selected files
- * @param [in] chooser the object which received the signal
- * @param [in] user data set when the signal handler was connected
- */
-void on_file_log_file_selection_changed(GtkFileChooser * chooser, gpointer user_data)
-{
-  // Get the filename for the currently selected file in the file selector
-  // and set path of log file for saving it to ini file
-  setLogFile(gtk_file_chooser_get_filename(chooser));
 }
 
 /**
@@ -205,4 +194,17 @@ gboolean on_sw_debug_output_state_set(GtkSwitch * widget, gboolean state, gpoint
   // Show debug output or not
   setDebugOutput(state);
   return FALSE;
+}
+
+// BIN
+/**
+ * @brief Emitted when there is a change in the set of selected files
+ * @param [in] chooser the object which received the signal
+ * @param [in] user data set when the signal handler was connected
+ */
+void on_file_log_file_selection_changed(GtkFileChooser * chooser, gpointer user_data)
+{
+  // Get the filename for the currently selected file in the file selector
+  // and set path of log file for saving it to ini file
+  setLogFile(gtk_file_chooser_get_filename(chooser));
 }
