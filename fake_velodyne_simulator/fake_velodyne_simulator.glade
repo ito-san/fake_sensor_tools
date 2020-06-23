@@ -58,7 +58,6 @@
     <signal name="value-changed" handler="on_adj_bot_v_in_value_changed" swapped="no"/>
   </object>
   <object class="GtkAdjustment" id="adj_motor_rpm">
-    <property name="lower">300</property>
     <property name="upper">1200</property>
     <property name="step_increment">10</property>
     <property name="page_increment">10</property>
