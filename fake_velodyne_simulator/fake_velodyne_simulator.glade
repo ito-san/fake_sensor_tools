@@ -238,6 +238,80 @@
       </packing>
     </child>
   </object>
+  <object class="GtkAdjustment" id="adj_rpm_setting">
+    <property name="lower">300</property>
+    <property name="upper">1200</property>
+    <property name="step_increment">60</property>
+    <property name="page_increment">60</property>
+    <signal name="value-changed" handler="on_adj_rpm_setting_value_changed" swapped="no"/>
+  </object>
+  <object class="GtkGrid" id="grd_settings">
+    <property name="name">Settings</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">15</property>
+    <signal name="map" handler="on_grd_map" object="hbr_header" swapped="no"/>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkFileChooserButton" id="file_settings_json">
+            <property name="width_request">250</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="create_folders">False</property>
+            <property name="title" translatable="yes">Choose info.json</property>
+            <signal name="selection-changed" handler="on_file_settings_json_selection_changed" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">RPM:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="width_request">45</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">json file:</property>
+        <property name="xalign">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScale">
+        <property name="width_request">100</property>
+        <property name="height_request">35</property>
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="adjustment">adj_rpm_setting</property>
+        <property name="round_digits">0</property>
+        <property name="digits">0</property>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+      </packing>
+    </child>
+  </object>
   <object class="GtkAdjustment" id="adj_top_2_5v">
     <property name="lower">2.2999999999999998</property>
     <property name="upper">2.7000000000000002</property>
@@ -816,7 +890,7 @@
             <property name="width_request">45</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Bottom Board (Raw A/D Voltage)</property>
+            <property name="label" translatable="yes">Bottom Board (Scaled)</property>
             <property name="xalign">0</property>
           </object>
           <packing>

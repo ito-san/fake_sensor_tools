@@ -51,6 +51,10 @@ void FakeVelodyneSimulator::loadIniFile(void)
     const char * str = v.get().c_str();
     strncpy(status_path_, str, strlen(str));
   }
+  if (boost::optional<std::string> v = pt.get_optional<std::string>("settings")) {
+    const char * str = v.get().c_str();
+    strncpy(settings_path_, str, strlen(str));
+  }
 
   //  Load data from info.json
   loadInfoJson();
@@ -58,6 +62,8 @@ void FakeVelodyneSimulator::loadIniFile(void)
   loadDiagJson();
   // Load data from status.json
   loadStatusJson();
+  // Load data from settings.json
+  loadSettingsJson();
 }
 
 void FakeVelodyneSimulator::saveIniFile(void)
@@ -68,6 +74,7 @@ void FakeVelodyneSimulator::saveIniFile(void)
   pt.put("info", info_path_);
   pt.put("diag", diag_path_);
   pt.put("status", status_path_);
+  pt.put("settings", settings_path_);
 
   write_ini(ini_path_, pt);
 }
@@ -351,6 +358,27 @@ void FakeVelodyneSimulator::setLaserState(bool laser_state)
 
 bool FakeVelodyneSimulator::getLaserState(void) const { return laser_state_; }
 
+// Settings
+void FakeVelodyneSimulator::setSettingsJson(const char * path)
+{
+  strncpy(settings_path_, path, strlen(path));
+  // Load data from settings.json
+  loadSettingsJson();
+}
+
+const char * FakeVelodyneSimulator::getSettingsJson(void) const { return settings_path_; }
+
+void FakeVelodyneSimulator::setRpmSetting(int rpm_setting)
+{
+  rpm_setting_ = rpm_setting;
+
+  pthread_mutex_lock(&mutex_json_);
+  settings_json_["rpm"] = rpm_setting_;
+  pthread_mutex_unlock(&mutex_json_);
+}
+
+int FakeVelodyneSimulator::getRpmSetting(void) const { return rpm_setting_; }
+
 void FakeVelodyneSimulator::loadInfoJson(void)
 {
   fs::ifstream ifs(info_path_, std::ios::in);
@@ -433,6 +461,16 @@ void FakeVelodyneSimulator::loadStatusJson(void)
   laser_state_ = (state == "On") ? true : false;
 }
 
+void FakeVelodyneSimulator::loadSettingsJson(void)
+{
+  fs::ifstream ifs(settings_path_, std::ios::in);
+  if (!ifs) return;
+  settings_json_ = json::value::parse(ifs);
+  ifs.close();
+
+  rpm_setting_ = settings_json_["rpm"].as_integer();
+}
+
 void FakeVelodyneSimulator::handleGet(http::http_request request)
 {
   // Get the underling URI of the request message
@@ -444,6 +482,8 @@ void FakeVelodyneSimulator::handleGet(http::http_request request)
     request.reply(http::status_codes::OK, diag_json_);
   } else if (path == "/cgi/status.json") {
     request.reply(http::status_codes::OK, status_json_);
+  } else if (path == "/cgi/settings.json") {
+    request.reply(http::status_codes::OK, settings_json_);
   } else {
     request.reply(http::status_codes::BadRequest);
   }

@@ -112,6 +112,15 @@ void setLaserState(int laser_state) { FakeVelodyneSimulator::get()->setLaserStat
 
 int getLaserState(void) { return FakeVelodyneSimulator::get()->getLaserState(); }
 
+// Settings
+void setSettingsJson(const char * path) { FakeVelodyneSimulator::get()->setSettingsJson(path); }
+
+const char * getSettingsJson(void) { return FakeVelodyneSimulator::get()->getSettingsJson(); }
+
+void setRpmSetting(int rpm_setting) { FakeVelodyneSimulator::get()->setRpmSetting(rpm_setting); }
+
+int getRpmSetting(void) { return FakeVelodyneSimulator::get()->getRpmSetting(); }
+
 #ifdef __cplusplus
 }
 #endif

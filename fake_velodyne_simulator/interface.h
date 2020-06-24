@@ -307,6 +307,31 @@ void setLaserState(int laser_state);
  */
 int getLaserState(void);
 
+// Settings
+/**
+ * @brief Set path of settings.json for saving it to ini file
+ * @param [in] path path of settings.json
+ */
+void setSettingsJson(const char * path);
+
+/**
+ * @brief Get path of settings.json stored in ini file
+ * @return path of settings.json
+ */
+const char * getSettingsJson(void);
+
+/**
+ * @brief Set rpm setting
+ * @param [in] rpm_setting rpm setting
+ */
+void setRpmSetting(int rpm_setting);
+
+/**
+ * @brief Get rpm setting
+ * @return rpm setting
+ */
+int getRpmSetting(void);
+
 #ifdef __cplusplus
 }
 #endif

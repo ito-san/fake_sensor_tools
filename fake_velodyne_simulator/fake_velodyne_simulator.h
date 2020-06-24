@@ -313,6 +313,31 @@ public:
    */
   bool getLaserState(void) const;
 
+  // Settings
+  /**
+   * @brief Set path of settings.json for saving it to ini file
+   * @param [in] path path of settings.json
+   */
+  void setSettingsJson(const char * path);
+
+  /**
+   * @brief Get path of settings.json stored in ini file
+   * @return path of settings.json
+   */
+  const char * getSettingsJson(void) const;
+
+  /**
+   * @brief Set rpm setting
+   * @param [in] rpm_setting rpm setting
+   */
+  void setRpmSetting(int rpm_setting);
+
+  /**
+   * @brief Get rpm setting
+   * @return rpm setting
+   */
+  int getRpmSetting(void) const;
+
 private:
   /**
    * @brief io direction
@@ -356,6 +381,11 @@ private:
    * @brief Load data from status.json
    */
   void loadStatusJson(void);
+
+  /**
+   * @brief Load data from settings.json
+   */
+  void loadSettingsJson(void);
 
   /**
    * @brief Handle 'GET' request
@@ -413,6 +443,11 @@ private:
   bool motor_state_;            //!< @brief motor state
   int motor_rpm_;               //!< @brief motor rpm
   bool laser_state_;            //!< @brief laser state
+
+  // Settings
+  char settings_path_[PATH_MAX];  //!< @brief path of settings.json
+  json::value settings_json_;     //!< @brief values of settings.json
+  int rpm_setting_;               //!< @brief rpm setting
 };
 
 #endif  // FAKE_IMU_SIMULATOR_FAKE_VELODYNE_SIMULATOR_H_

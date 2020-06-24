@@ -53,6 +53,9 @@ typedef struct
   GtkAdjustment * adj_motor_rpm;  //!< @brief GtkAdjustment
   GtkWidget * sw_laser_state;     //!< @brief GtkSwitch
 
+  GtkWidget * grd_settings;         //!< @brief GtkGrid
+  GtkWidget * file_settings_json;   //!< @brief GtkFileChooserButton
+  GtkAdjustment * adj_rpm_setting;  //!< @brief GtkAdjustment
 } Widgets;
 
 void initGeneral(GtkBuilder * b, Widgets * w)
@@ -82,7 +85,8 @@ void initInfo(GtkBuilder * b, Widgets * w)
   gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_info, "title", "Info", NULL);
 
   // Set filename as the current filename for the file chooser
-  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_info_json), getInfoJson());
+  const char * file = getInfoJson();
+  if (strlen(file) > 0) gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_info_json), file);
 }
 
 void initDiag(GtkBuilder * b, Widgets * w)
@@ -112,7 +116,8 @@ void initDiag(GtkBuilder * b, Widgets * w)
   gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_diag, "title", "Diagnostics", NULL);
 
   // Set filename as the current filename for the file chooser
-  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_diag_json), getDiagJson());
+  const char * file = getDiagJson();
+  if (strlen(file) > 0) gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_diag_json), file);
 
   // Sets the GtkAdjustment value
   gtk_adjustment_set_value(w->adj_top_hv, getTopHv());
@@ -147,7 +152,8 @@ void initStatus(GtkBuilder * b, Widgets * w)
   gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_status, "title", "Status", NULL);
 
   // Set filename as the current filename for the file chooser
-  gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_status_json), getStatusJson());
+  const char * file = getStatusJson();
+  if (strlen(file) > 0) gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_status_json), file);
 
   // Sets the underlying state
   gtk_switch_set_state(GTK_SWITCH(w->sw_motor_state), getMotorState());
@@ -155,6 +161,26 @@ void initStatus(GtkBuilder * b, Widgets * w)
 
   // Sets the GtkAdjustment value
   gtk_adjustment_set_value(w->adj_motor_rpm, getMotorRpm());
+}
+
+void initSettings(GtkBuilder * b, Widgets * w)
+{
+  w->grd_settings = GTK_WIDGET(gtk_builder_get_object(b, "grd_settings"));
+  w->file_settings_json = GTK_WIDGET(gtk_builder_get_object(b, "file_settings_json"));
+  w->adj_rpm_setting = GTK_ADJUSTMENT(gtk_builder_get_object(b, "adj_rpm_setting"));
+
+  // Adds a child to stack
+  gtk_stack_add_named(GTK_STACK(w->stk_base), w->grd_settings, "Settings");
+  // Sets one or more child properties for child and container
+  gtk_container_child_set(GTK_CONTAINER(w->stk_base), w->grd_settings, "title", "Settings", NULL);
+
+  // Set filename as the current filename for the file chooser
+  const char * file = getSettingsJson();
+  if (strlen(file) > 0)
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w->file_settings_json), file);
+
+  // Sets the GtkAdjustment value
+  gtk_adjustment_set_value(w->adj_rpm_setting, getRpmSetting());
 }
 
 int main(int argc, char * argv[])
@@ -186,6 +212,8 @@ int main(int argc, char * argv[])
   initDiag(builder, widgets);
   // Status
   initStatus(builder, widgets);
+  // Settings
+  initSettings(builder, widgets);
 
   // Set a position constraint for this window
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ALWAYS);
@@ -550,4 +578,30 @@ gboolean on_sw_laser_state_state_set(GtkSwitch * widget, gboolean state, gpointe
   // Set laser state
   setLaserState(state);
   return FALSE;
+}
+
+// Settings
+/**
+ * @brief Emitted when there is a change in the set of selected files
+ * @param [in] chooser the object which received the signal
+ * @param [in] user data set when the signal handler was connected
+ */
+void on_file_settings_json_selection_changed(GtkFileChooser * chooser, gpointer user_data)
+{
+  // Get the filename for the currently selected file in the file selector
+  // and set path of diag.json for saving it to ini file
+  setSettingsJson(gtk_file_chooser_get_filename(chooser));
+}
+
+/**
+ * @brief Emitted when the “value” property has been changed
+ * @param [in] adjustment the object which received the signal
+ * @param [in] user_data user data set when the signal handler was connected
+ */
+void on_adj_rpm_setting_value_changed(GtkAdjustment * adjustment, gpointer user_data)
+{
+  // Gets the current value of the adjustment
+  gdouble value = gtk_adjustment_get_value(adjustment);
+  // Set rpm setting
+  setRpmSetting(value);
 }
